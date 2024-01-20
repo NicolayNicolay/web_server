@@ -1,0 +1,38 @@
+.bd-sidebar {
+  //padding: 1.875rem;
+  @include media-breakpoint-up(lg) {
+    width: 220px;
+    min-width: 220px;
+    border-right: 1px solid #dce0e6;
+  }
+  .bd-menu{
+    @include media-breakpoint-down(xxl) {
+      width: 100%;
+    }
+    .nav-item{
+      @include media-breakpoint-up(xxl) {
+        width: 100%;
+      }
+      @include media-breakpoint-down(xxl) {
+        display: inline-block;
+      }
+      .btn{
+        width: 100%;
+      }
+      .btn-lg{
+        --mo-btn-padding-x: 0;
+      }
+    }
+  }
+}
+.scroll-wrapper {
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  white-space: nowrap;
+}
+
+/*.mx-n20 {
+  margin-left: -0.4375rem!important;
+  margin-right: -1.875rem!important;
+}*/

@@ -1,0 +1,85 @@
+<template>
+    <div class="form-group">
+      <label v-if="label" :for="id" v-text="label"></label>
+      <select
+        class="form-select"
+        :class="[hasError ? 'is-invalid' : '']"
+        @change="change"
+        :multiple="multiple"
+        :name="name"
+        :id="id"
+        v-model="value"
+        :disabled="disabled">
+        <option v-if="defaultNothing" value="">{{ defaultNothingText ?? 'Ничего не выбрано' }}</option>
+        <option v-for="(option, index) in options" :value="option.id" v-text="getName(option)" :key="index"></option>
+      </select>
+      <span class="invalid-feedback" v-if="hasError" v-text="error"></span>
+      <div class="small text-secondary opacity-75" v-if="help">{{ help }}</div>
+    </div>
+</template>
+
+<script lang="ts">
+export default {
+  name: "SelectComponent",
+  props: {
+    modelValue: [String, Number],
+    options: {
+      type: [Array, Object]
+    },
+    name: String,
+    label: {
+      type: [String, Number],
+      default: null,
+    },
+    id: String,
+    error: {
+      type: [String, Number],
+      default: null,
+    },
+    defaultNothing: {
+      type: Boolean,
+      default: true,
+    },
+    defaultNothingText: {
+      type: String,
+      default: null,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    multiple: {
+      type: Boolean,
+      default: false,
+    },
+    displayName: {
+      type: String,
+      default: 'name',
+    },
+    help: {
+      type: [String, Number],
+      default: null,
+    },
+  },
+  emits: ['update:modelValue'],
+  data() {
+    return {
+      value: this.modelValue,
+      elementId: this.id ? this.id : this.name
+    }
+  },
+  computed: {
+    hasError() {
+      return !!this.error;
+    },
+  },
+  methods: {
+    getName(option: string) {
+      return option[this.displayName];
+    },
+    change() {
+      this.$emit('update:modelValue', this.value);
+    }
+  }
+}
+</script>
