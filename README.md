@@ -4,7 +4,7 @@
 ## Installation
 
 ```bash
-git clone git@github.com:enterprise-it-ru/web_server.git web_server.local
+git clone git@github.com:NicolayNicolay/web_server.git web_server.local
 cd web_server.local
 composer install
 ```
