@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Status\Services;
 
 use Illuminate\Http\Client\RequestException;
@@ -8,10 +10,10 @@ use Modules\Api\Services\ApiService;
 use Modules\Errors\Services\ErrorsServices;
 use Modules\Status\Resources\CarrierboardResource;
 use Modules\Status\Resources\MotherboardResource;
+use Modules\Status\Resources\StatusMotherboardResource;
 
 class StatusService extends ApiService
 {
-
     public function __construct(Api $api, ErrorsServices $errorsServices)
     {
         parent::__construct($api, $errorsServices);
@@ -31,16 +33,16 @@ class StatusService extends ApiService
 
     public function getActiveMotherboardsData(): array
     {
-        $data = $this->getActiveDevices();
+        $devices = $this->getActiveDevices();
+        $devices_data = $this->getActiveDevicesData();
         $result = [];
-        if ($data) {
-            foreach ($data['Motherboard'] as $key => $datum) {
-                $tmp_item = $datum;
+        if ($devices) {
+            foreach ($devices['Motherboard'] as $key => $datum) {
+                $tmp_item = (new StatusMotherboardResource($datum))->toArray();
                 $tmp_item['name'] = $key;
-                $tmp_item['switch'] = $data['Switch']['Model'];
-                $tmp_item['Bottom'] = $data['PSU_FRU']['FRU_Bottom'];
-                $tmp_item['Top'] = $data['PSU_FRU']['FRU_Top'];
-                $tmp_item['Housing'] = $data['PSU_FRU']['FRU_Housing'];
+                $tmp_item['bottom'] = $devices_data['PSU_FRU']['FRU_Bottom']['Model'];
+                $tmp_item['top'] = $devices_data['PSU_FRU']['FRU_Top']['Model'];
+                $tmp_item['housing'] = $devices_data['PSU_FRU']['FRU_Housing']['Model'];
                 $result[] = $tmp_item;
             }
         }
@@ -49,11 +51,11 @@ class StatusService extends ApiService
 
     public function getActiveCarrierboardsData(): array
     {
-        $data = $this->getActiveDevices();
+        $devices = $this->getActiveDevices();
         $carrirboards = $this->getCarrierboardsData();
         $result = [];
-        if ($data) {
-            foreach ($data['Carrierboard'] as $key => $datum) {
+        if ($devices) {
+            foreach ($devices['Carrierboard'] as $key => $datum) {
                 $tmp_item = $datum;
                 $tmp_item['name'] = $key;
                 $tmp_carrierboard = in_array($key, array_column($carrirboards, 'name')) ? $carrirboards[array_search($key, array_column($carrirboards, 'name'))] : null;

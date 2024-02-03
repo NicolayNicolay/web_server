@@ -9,7 +9,6 @@ use Modules\Controller\Services\ControllerGraphService;
 use Modules\Graph\AbstractGraph;
 use Modules\Graph\GraphInterface;
 use Modules\Temperatures\Models\Temperatures;
-
 use Modules\Temperatures\Models\TemperaturesCategories;
 
 use function Modules\Control\Services\sort;
@@ -41,7 +40,7 @@ class CpuGraphService extends AbstractGraph
         $labels = [];
         $key = 0;
         if ($data['items']) {
-            foreach ($data['items'] as $datum) {
+            foreach ($data['items']['data'] as $datum) {
                 $result['series'][] = [
                     'show'       => false,
                     'name'       => $datum['name'],
@@ -73,24 +72,5 @@ class CpuGraphService extends AbstractGraph
         ];
         $result['legend'] = $labels;
         return $result;
-    }
-
-    public function getCorrectData(array $array, string $name): array
-    {
-        $data = [];
-        $all_dates = $this->getMonthRangeDate();
-        foreach ($all_dates as $date) {
-            if (! array_key_exists($date, $array['data'])) {
-                $data[] = 0;
-            } else {
-                $data[] = $array['data'][$date];
-            }
-        }
-
-        return [
-            'data' => $data,
-            'name' => $name,
-            'code' => $array['code'],
-        ];
     }
 }

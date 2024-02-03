@@ -8,7 +8,7 @@
         </div>
         <div class="col-12">
           <div class="d-flex pt-3">
-            <button class="btn border btn-lg" :class="active.cpus? 'btn-primary' : ''" @click="toggleActive('cpu')">
+            <button class="btn border btn-lg" :class="active.cpu? 'btn-primary' : ''" @click="toggleActive('cpu')">
               CPUs
             </button>
             <button class="btn border btn-lg ms-3" :class="active.switch? 'btn-primary' : ''" @click="toggleActive('switch')">
@@ -72,9 +72,10 @@ const graph = ref()
 const update = ref(0)
 const option = ref({
   grid: {
-    left: "3%",
-    right: "22%",
-    bottom: 40,
+    left: 80,
+    right: 160,
+    bottom: 20,
+    top: 40,
     containLabel: true
   },
   tooltip: {
@@ -162,17 +163,8 @@ const option = ref({
     data: [],
     show: true,
     orient: "vertical",
-    left: "80%",
     right: 20,
     top: 20,
-    bottom: 20,
-    // icon: "circle",
-    padding: [
-      40,
-      10,
-      40,
-      10
-    ],
     textStyle: {
       "width": 150,
       "overflow": "truncate",
@@ -241,16 +233,10 @@ function toggleActive(code: 'cpu' | 'switch' | 'controller' | 'psu') {
       }
     }
   });
-  console.log(option.value.series)
 }
 </script>
 <style scoped>
 .chart {
   height: 400px;
-}
-
-.btn {
-  --bs-btn-hover-bg: #0d6efd;
-  --bs-btn-hover-color: white;
 }
 </style>

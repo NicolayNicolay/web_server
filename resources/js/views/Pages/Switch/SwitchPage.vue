@@ -212,7 +212,6 @@ async function getData() {
   await axios.get('/api/temperatures/getSwitchData')
     .then((response) => {
       data.value = response.data;
-      console.log(data.value);
     })
     .catch(() => {
     })

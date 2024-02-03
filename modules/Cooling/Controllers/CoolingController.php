@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Cooling\Controllers;
 
 use Illuminate\Http\Request;
@@ -14,5 +16,4 @@ class CoolingController
     {
         return $service->getGraph();
     }
-
 }

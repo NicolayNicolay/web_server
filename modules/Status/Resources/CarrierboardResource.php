@@ -14,7 +14,7 @@ class CarrierboardResource extends AbstractResource
             'name'           => $this->data['name'] ?? '',
             'num'            => $this->data['num'] ?? '',
             'placement'      => $this->data['placement'] ?? '',
-            'insert_status'  => $this->data['insert_status'] ?? '',
+            'insert_status'  => $this->getInsertedStatus(),
             'sub_name'       => $this->data['info'] ? $this->data['info']['P/n'] . ', Rev.:' . $this->data['info']['Rev'] . ', S/n:' . $this->data['info']['S/n'] . ', Date:' . $this->data['info']['Date'] : '',
             'inserted'       => $this->getCpusInserted(),
             'status'         => $this->getCpusStatus(),
@@ -105,11 +105,19 @@ class CarrierboardResource extends AbstractResource
 
     public function getCpuStatus(): array
     {
-        return [
-            'value'  => 'Good',
-            'status' => 1,
-            'class'  => $this->getClass(1),
-        ];
+        if (in_array('CPUs power fault', $this->data['faults']) || in_array('CPUs no power, powered off or overheated', $this->data['faults'])) {
+            return [
+                'value'  => 'Fault',
+                'status' => 2,
+                'class'  => $this->getClass(2),
+            ];
+        } else {
+            return [
+                'value'  => 'Good',
+                'status' => 1,
+                'class'  => $this->getClass(1),
+            ];
+        }
     }
 
     public function getCpuVoltage(): ?array
@@ -145,5 +153,18 @@ class CarrierboardResource extends AbstractResource
             2 => 'table-danger',
             3 => 'table-secondary',
         };
+    }
+
+    public function getInsertedStatus(): array
+    {
+        $res = [
+            'value' => $this->data['insert_status'],
+        ];
+        $res['class'] = match ($this->data['insert_status']) {
+            'Inserted' => $this->getClass(1),
+            'Absent' => $this->getClass(2),
+            default => $this->getClass(3),
+        };
+        return $res;
     }
 }

@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Api\Services;
 
 use Carbon\Carbon;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\JsonResponse;
 use Modules\Api\Api;
 use Modules\Errors\Services\ErrorsServices;
 use Modules\Status\Resources\CarrierboardResource;
@@ -11,7 +14,6 @@ use Modules\Temperatures\Models\TemperaturesCategories;
 
 abstract class ApiService
 {
-
     protected Api $api;
     protected array $categories;
     protected ErrorsServices $errors;
@@ -41,7 +43,7 @@ abstract class ApiService
         return null;
     }
 
-    public function getStatusData($url): ?bool
+    public function getStatusData($url): JsonResponse | bool
     {
         try {
             $data = $this->api->get($url);
@@ -49,9 +51,12 @@ abstract class ApiService
                 return true;
             }
         } catch (RequestException $requestException) {
-            $this->errors->createError($requestException, $url);
+            $error = $this->errors->createError($requestException, $url);
+            return response()->json([
+                                        'message' => $error,
+                                    ], 500);
         }
-        return null;
+        return false;
     }
 
     public function postData($url, $data)
@@ -113,15 +118,24 @@ abstract class ApiService
     {
         $uptimeSecond = $this->getData('/server/getUptime');
         if ($uptimeSecond) {
-            $uptimeSecond = $uptimeSecond['uptime'];
-            $minutes = floor((int) $uptimeSecond / 60);
-            $hours = floor($minutes / 60);
-            $minutes = $minutes - ($hours * 60);
-            $now = Carbon::now()->subSeconds($uptimeSecond)->format('d.m.Y');
-            return [
-                'timing' => $hours . 'h ' . $minutes . 'm',
-                'date'   => $now,
-            ];
+            if ($uptimeSecond['uptime']['server'] > 0) {
+                $uptimeSecond = $uptimeSecond['uptime']['server'];
+                $minutes = floor((int) $uptimeSecond / 60);
+                $hours = floor($minutes / 60);
+                $minutes = $minutes - ($hours * 60);
+                $now = Carbon::now()->subSeconds($uptimeSecond)->format('d.m.Y');
+                return [
+                    'timing' => $hours > 0 ? $hours . 'h ' : '' . $minutes . 'm',
+                    'date'   => $now,
+                    'status' => true,
+                ];
+            } else {
+                return [
+                    'timing' => null,
+                    'date'   => $uptimeSecond['timestamp']['server_off'] ? Carbon::parse($uptimeSecond['timestamp']['server_off'])->format('d.m.Y h:iA') : '',
+                    'status' => false,
+                ];
+            }
         }
         return null;
     }
@@ -151,13 +165,13 @@ abstract class ApiService
     }
 
     //Провести инвентаризацию
-    public function inventoryNow(): ?bool
+    public function inventoryNow(): JsonResponse | bool
     {
         return $this->getStatusData('/inventory');
     }
 
     //Инициализировать устройства
-    public function initDevices(): ?bool
+    public function initDevices(): JsonResponse | bool
     {
         return $this->getStatusData('/control/initDevices');
     }
@@ -171,7 +185,10 @@ abstract class ApiService
     {
         return $this->getData('/devices/getActiveDevices');
     }
-
+    public function getActiveDevicesData()
+    {
+        return $this->getData('/devices/getActiveDevicesData');
+    }
     public function getMotherboardsData()
     {
         return $this->getData('/motherboards/getMotherboardsData');

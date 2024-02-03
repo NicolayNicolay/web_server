@@ -11,7 +11,7 @@
               </div>
             </div>
           </div>
-          <div class="help-text small text-center mt-1">Uptime: {{ data.uptime.timing }} since<br>{{ data.uptime.date }}</div>
+          <div class="help-text small text-center mt-1" v-html="workedTiming"></div>
         </div>
 
 
@@ -166,15 +166,22 @@
 <script lang="ts" setup>
 import AdminLayout from "@/views/Layout/AdminLayout.vue";
 import axios from "axios";
-import {onMounted, ref} from "vue";
+import {onMounted, ref, watch} from "vue";
 import LoadingComponent from "@/components/System/LoadingComponent.vue";
+import {useStatus} from "@/composables/useStatus";
 
+const {statusParams} = useStatus()
 const data = ref([])
 const loading = ref(true)
 const powerStatus = ref('')
+const workedTiming = ref('')
 
 onMounted(() => {
   getData();
+})
+
+watch(statusParams, () => {
+  getData()
 })
 
 //Functions
@@ -184,6 +191,7 @@ async function getData() {
     .then((response) => {
       data.value = response.data;
       powerStatus.value = data.value.status.value.toUpperCase();
+      getWorkedTiming();
     })
     .catch(() => {
     })
@@ -192,10 +200,17 @@ async function getData() {
     })
 }
 
+function getWorkedTiming() {
+  if (data.value.uptime && data.value.uptime.status) {
+    workedTiming.value = 'Uptime: ' + data.value.uptime.timing + ' since<br>' + data.value.uptime.date;
+  } else {
+    workedTiming.value = 'Last working time: ' + data.value.uptime.date;
+  }
+}
+
 function inventoryNow() {
   loading.value = true;
   axios.get('/api/server/inventory').then((response) => {
-    console.log(response.data);
     getData();
   })
     .catch(() => {
@@ -204,7 +219,6 @@ function inventoryNow() {
 
 function initDevices() {
   axios.get('/api/server/initDevices').then((response) => {
-    console.log(response.data);
     getData();
   })
     .catch(() => {

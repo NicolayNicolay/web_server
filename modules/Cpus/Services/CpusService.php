@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Cpus\Services;
 
 use Modules\Api\Api;
@@ -8,7 +10,6 @@ use Modules\Errors\Services\ErrorsServices;
 
 class CpusService extends ApiService
 {
-
     public function __construct(Api $api, ErrorsServices $errorsServices)
     {
         parent::__construct($api, $errorsServices);

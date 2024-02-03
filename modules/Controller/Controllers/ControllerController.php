@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Controller\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Controller\Services\ControllerGraphService;
 use Modules\Controller\Services\ControllerService;
@@ -26,17 +29,17 @@ class ControllerController
     }
 
 
-    public function powerOff(): bool
+    public function powerOff(): JsonResponse | bool
     {
         return $this->service->powerOff();
     }
 
-    public function softReboot(): bool
+    public function softReboot(): JsonResponse | bool
     {
         return $this->service->softReboot();
     }
 
-    public function hardReboot(): bool
+    public function hardReboot(): JsonResponse | bool
     {
         return $this->service->hardReboot();
     }

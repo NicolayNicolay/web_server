@@ -2,7 +2,7 @@
   <admin-layout>
     <div v-if="!loading">
       <div class="alert alert-info" v-if="empty">Данные отсутствуют</div>
-      <v-chart class="chart mt-4 border" :option="option" v-else/>
+      <v-chart class="chart mt-4 pt-3 border" :option="option" v-else/>
     </div>
     <loading-component v-else></loading-component>
   </admin-layout>
@@ -49,9 +49,10 @@ provide(THEME_KEY, "default");
 
 const option = ref({
   grid: {
-    left: "3%",
-    right: "22%",
-    bottom: 40,
+    left: 80,
+    right: 140,
+    bottom: 20,
+    top: 40,
     containLabel: true
   },
   title: {
@@ -80,17 +81,8 @@ const option = ref({
     data: [],
     show: true,
     orient: "vertical",
-    left: "80%",
     right: 20,
     top: 20,
-    bottom: 20,
-    // icon: "circle",
-    padding: [
-      40,
-      10,
-      40,
-      10
-    ],
     textStyle: {
       "width": 150,
       "overflow": "truncate",

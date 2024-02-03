@@ -2,6 +2,9 @@
   <admin-layout>
     <div class="row" v-if="!loading">
       <div class="col-md-12">
+        <div class="text-danger text-center fs-5 mb-2" v-if="error.status">
+          {{ error.message }}
+        </div>
         <div class="text-bg-success mb-4" :class="data.status.card_class" v-if="data.status">
           <div class="fw-bold p-2 text-center" style="font-size: 21px">SERVER IS {{ powerStatus }}</div>
         </div>
@@ -58,8 +61,10 @@
 import AdminLayout from "@/views/Layout/AdminLayout.vue";
 import LoadingComponent from "@/components/System/LoadingComponent.vue";
 import axios from "axios";
-import {onMounted, ref} from "vue";
+import {onMounted, ref, watch} from "vue";
+import {useStatus} from "@/composables/useStatus";
 
+const {statusParams, checkStatus} = useStatus()
 const data = ref([])
 const loading = ref(true)
 const powerStatus = ref('')
@@ -80,6 +85,16 @@ const apiPower = ref([
   '/api/server/on',
 ])
 const powerActiveState = ref(0)
+const error = ref({
+  'message': '',
+  'status': false
+})
+
+watch(statusParams, () => {
+  if (statusParams.serverData.status.value.toUpperCase() != powerStatus.value) {
+    getData()
+  }
+})
 
 onMounted(() => {
   getData();
@@ -90,13 +105,14 @@ async function getData() {
   loading.value = true;
   await axios.get('/api/control/getMainPowerData')
     .then((response) => {
+      clearError()
       data.value = response.data;
       powerStatus.value = data.value.status.value.toUpperCase();
       powerActiveState.value = data.value.status.state;
     })
-    .catch(() => {
-    })
-    .finally(() => {
+    .catch((error) => {
+      setError(error.response.data.message)
+    }).finally(() => {
       loading.value = false;
     })
 }
@@ -105,10 +121,33 @@ function turnToggle() {
   loading.value = true;
   let api = apiPower.value[powerActiveState.value - 1];
   axios.get(api).then(() => {
+    clearError()
+  })
+    .catch((error) => {
+      setError(error.response.data.message)
+    }).finally(() => {
+    checkStatus()
+  })
+}
+
+function inventoryNow() {
+  loading.value = true;
+  axios.get('/api/server/inventory').then(() => {
     getData();
   })
-    .catch(() => {
+    .catch((error) => {
+      setError(error.response.data.message)
     })
+}
+
+function clearError() {
+  error.value.status = false
+  error.value.message = ''
+}
+
+function setError(mess: string) {
+  error.value.status = true
+  error.value.message = mess
 }
 
 function rebootNow() {
@@ -116,7 +155,10 @@ function rebootNow() {
   axios.get('/api/server/reboot').then(() => {
     getData();
   })
-    .catch(() => {
-    })
+    .catch((error) => {
+      setError(error.response.data.message)
+    }).finally(() => {
+    loading.value = false;
+  })
 }
 </script>

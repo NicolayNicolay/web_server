@@ -13,6 +13,7 @@ use Modules\Errors\Services\ErrorsServices;
 use Modules\Server\Controllers\ServerController;
 use Modules\Status\Controllers\StatusController;
 use Modules\Temperatures\Controllers\TemperaturesController;
+use Modules\Temperatures\Models\Temperatures;
 use Modules\Temperatures\Models\TemperaturesCategories;
 
 Route::group(['prefix' => 'api'], function () {
@@ -67,7 +68,16 @@ Route::group(['prefix' => 'api'], function () {
     });
     Route::get('/test', function (Api $api, ErrorsServices $errorsServices) {
         $data = $api->get('/temperature/getCpusData');
-        dd($data);
+        if ($data['data']) {
+            foreach ($data['data'] as $item) {
+                $res = [
+                    'category_id' => 4,
+                    'name'        => $item['name'],
+                    'value'       => $item['temperature'],
+                ];
+                (new Temperatures())->create($res);
+            }
+        }
     });
 });
 

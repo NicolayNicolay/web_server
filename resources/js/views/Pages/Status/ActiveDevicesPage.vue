@@ -1,6 +1,9 @@
 <template>
   <admin-layout>
     <div class="row" v-if="!loading">
+      <div class="col-12 mb-4">
+        <button class="btn btn-primary me-sm-4 mt-2" @click.prevent="getData">Refresh info</button>
+      </div>
       <div class="col-md-12 col-xxl-5" v-if="data.motherboards">
         <div class="card mb-4">
           <h5 class="card-title text-center mt-2 mb-2">Motherboards</h5>
@@ -12,35 +15,35 @@
               <div class="card-body">
                 <div class="card-text">
                   <ul>
-                    <li v-if="item.Memory">
-                      Memory: {{ item.Memory }}
+                    <li v-if="item.memory">
+                      Memory: {{ item.memory }}
                     </li>
-                    <li v-if="item.Motherboard">
-                      Motherboard: {{ item.Motherboard }}
+                    <li v-if="item.motherboard">
+                      Motherboard: {{ item.motherboard }}
                     </li>
                     <li v-if="item.switch">
                       Switch: {{ item.switch }}
                     </li>
-                    <li v-if="item.Expander">
-                      Expander: {{ item.Expander }}
+                    <li v-if="item.expander">
+                      Expander: {{ item.expander }}
                     </li>
-                    <li v-if="item.Tsensor">
-                      Tsensor: {{ item.Tsensor }}
+                    <li v-if="item.tsensor">
+                      Tsensor: {{ item.tsensor }}
                     </li>
-                    <li v-if="item.UART">
-                      UART: {{ item.UART }}
+                    <li v-if="item.uart">
+                      UART: {{ item.uart }}
                     </li>
-                    <li>
-                      FAN: ADT7173ARQZ-1 RL
+                    <li v-if="item.fan">
+                      FAN: {{ item.fan }}
                     </li>
-                    <li v-if="item.Bottom">
-                      Bottom: {{ item.Bottom }}
+                    <li v-if="item.bottom">
+                      Bottom: {{ item.bottom }}
                     </li>
-                    <li v-if="item.Top">
-                      Top: {{ item.Top }}
+                    <li v-if="item.top">
+                      Top: {{ item.top }}
                     </li>
-                    <li v-if="item.Housing">
-                      Housing: {{ item.Housing }}
+                    <li v-if="item.housing">
+                      Housing: {{ item.housing }}
                     </li>
                   </ul>
                 </div>
@@ -70,7 +73,7 @@
               </div>
             </div>
           </div>
-          <div class="col-12 col-sm-6">
+          <div class="col-12 col-sm-6" v-if="data.devices">
             <div class="card" :class="(data.devices && data.devices.cpus_class) ? data.devices.cpus_class: ''">
               <div class="card-header fw-semibold">CPUs status:</div>
               <div class="card-body">
@@ -104,13 +107,13 @@
                 </thead>
                 <tbody>
                 <tr v-for="item in data.carrierboards">
-                  <td>{{ item.num }}</td>
-                  <td :class="item.cpus.class">{{ item.cpus.value }}</td>
-                  <td>{{ item.Carrierboard }}</td>
-                  <td>{{ item.Expander }}</td>
-                  <td>{{ item.Tsensor }}</td>
-                  <td>{{ item.UART }}</td>
-                  <td>{{ item.Memory }}</td>
+                  <td><span v-if="item.num">{{ item.num }}</span></td>
+                  <td :class="item.cpus ? item.cpus.class : ''"><span v-if="item.cpus">{{ item.cpus.value }}</span></td>
+                  <td><span v-if="item.Carrierboard">{{ item.Carrierboard }}</span></td>
+                  <td><span v-if="item.Expander">{{ item.Expander }}</span></td>
+                  <td><span v-if="item.Tsensor">{{ item.Tsensor }}</span></td>
+                  <td><span v-if="item.UART">{{ item.UART }}</span></td>
+                  <td><span v-if="item.Memory">{{ item.Memory }}</span></td>
                 </tr>
                 </tbody>
               </table>
@@ -127,10 +130,8 @@
 import AdminLayout from "@/views/Layout/AdminLayout.vue";
 import axios from "axios";
 import LoadingComponent from "@/components/System/LoadingComponent.vue";
-import {useSidebar} from "@/composables/useSidebar";
 import {onMounted, ref} from "vue";
 
-// const {init} = useSidebar();
 const sidebar = [
   {
     'name': 'Summary status',
@@ -148,7 +149,6 @@ const sidebar = [
 const data = ref([])
 const loading = ref(true)
 
-// init(sidebar);
 
 onMounted(() => {
   getData();
@@ -160,7 +160,6 @@ async function getData() {
   await axios.get('/api/status/getActiveDevices')
     .then((response) => {
       data.value = response.data;
-      console.log(data.value);
     })
     .catch(() => {
     })
@@ -171,8 +170,7 @@ async function getData() {
 
 function inventoryNow() {
   loading.value = true;
-  axios.get('/api/server/inventory').then((response) => {
-    console.log(response.data);
+  axios.get('/api/server/inventory').then(() => {
     getData();
   })
     .catch(() => {

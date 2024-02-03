@@ -14,7 +14,6 @@ use Modules\Temperatures\Models\TemperaturesCategories;
 
 class TemperaturesApiService extends ApiService
 {
-
     public function __construct(Api $api, ErrorsServices $errorsServices)
     {
         parent::__construct($api, $errorsServices);
@@ -75,12 +74,14 @@ class TemperaturesApiService extends ApiService
         try {
             $data = $this->api->get('/temperature/getCpusData');
             if ($data['data']) {
-                $res = [
-                    'category_id' => $this->categories['controller'],
-                    'name'        => $data['data']['name'],
-                    'value'       => $data['data']['temperature'],
-                ];
-                (new Temperatures())->create($res);
+                foreach ($data['data'] as $item) {
+                    $res = [
+                        'category_id' => $this->categories['cpu'],
+                        'name'        => $item['name'],
+                        'value'       => $item['temperature'],
+                    ];
+                    (new Temperatures())->create($res);
+                }
             }
         } catch (RequestException $requestException) {
             $this->errors->createError($requestException, ['temperature', 'cpu']);

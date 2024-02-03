@@ -1,7 +1,8 @@
 <template>
   <admin-layout>
     <div class="row" v-if="!loading">
-      <div class="col-12 mb-4"><button class="btn btn-primary me-sm-4 mt-2" @click.prevent="rebootAllModal">
+      <div class="col-12 mb-4">
+        <button class="btn btn-primary me-sm-4 mt-2" @click.prevent="rebootAllModal">
           Reboot all carrierboards with its components (CPUs, LAN, USB)
         </button>
         <button class="btn btn-primary mt-2">Write flash memory (MB): Part number, Revision, Serial, Mfr.date</button>
@@ -26,13 +27,13 @@
                   <td>Active faults</td>
                 </tr>
                 <tr>
-                  <td class="table-success">{{ item.motherboard.el_v_carrierboards_status }}</td>
-                  <td class="table-success">{{ item.motherboard.v_cpu_status }}</td>
-                  <td class="table-success">{{ item.motherboard.three_v_carrierboards_status }}</td>
-                  <td class="table-success">{{ item.motherboard.three_v_standby_voltage }}</td>
-                  <td class="table-success">{{ item.motherboard.three_v_main_voltage }}</td>
-                  <td class="table-success">{{ item.motherboard.hotplug_status }}</td>
-                  <td class="table-success">{{ item.motherboard.faults }}</td>
+                  <td :class="item.motherboard.el_v_carrierboards_status['class']">{{ item.motherboard.el_v_carrierboards_status['value'] }}</td>
+                  <td :class="item.motherboard.v_cpu_status['class']">{{ item.motherboard.v_cpu_status['value'] }}</td>
+                  <td :class="item.motherboard.three_v_carrierboards_status['class']">{{ item.motherboard.three_v_carrierboards_status['value'] }}</td>
+                  <td :class="item.motherboard.three_v_standby_voltage['class']">{{ item.motherboard.three_v_standby_voltage['value'] }}</td>
+                  <td :class="item.motherboard.three_v_main_voltage['class']">{{ item.motherboard.three_v_main_voltage['value'] }}</td>
+                  <td :class="item.motherboard.hotplug_status['class']">{{ item.motherboard.hotplug_status['value'] }}</td>
+                  <td :class="item.motherboard.faults['class']">{{ item.motherboard.faults['value'] }}</td>
                 </tr>
                 </tbody>
               </table>
@@ -53,10 +54,10 @@
                 <tbody>
                 <tr v-for="cb in item.carrierboards">
                   <td class="">CPU carrierboard {{ cb['placement'] }}</td>
-                  <td class="table-success">{{ cb['insert_status'] }}</td>
-                  <td class="table-success">{{ cb['5v_cpu_status'] }}</td>
-                  <td class="table-success">{{ cb['5v_cpu_voltage'] }}</td>
-                  <td class="table-success">{{ cb['5v_cpu_power'] }}</td>
+                  <td :class="cb['insert_status']['class']">{{ cb['insert_status']['value'] }}</td>
+                  <td :class="cb['5v_cpu_status']['class']">{{ cb['5v_cpu_status']['value'] }}</td>
+                  <td :class="cb['5v_cpu_voltage']['class']">{{ cb['5v_cpu_voltage']['value'] }}</td>
+                  <td :class="cb['5v_cpu_power']['class']">{{ cb['5v_cpu_power']['value'] }}</td>
                   <td class="table-btn-wrapper">
                     <button class="btn btn-sm btn-primary d-flex align-items-center" @click.prevent="switchResetModal(cb['id'])">
                       <power-icon></power-icon>
@@ -104,7 +105,6 @@ async function getData() {
   await axios.get('/api/control/getMbCbData')
     .then((response) => {
       data.value = response.data;
-      console.log(data.value);
     })
     .catch(() => {
     })

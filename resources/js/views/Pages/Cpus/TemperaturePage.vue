@@ -50,7 +50,7 @@ provide(THEME_KEY, "default");
 const option = ref({
   grid: {
     left: 80,
-    right: 80,
+    right: 140,
     bottom: 20,
     top: 40,
     containLabel: true
@@ -77,17 +77,8 @@ const option = ref({
     data: [],
     show: true,
     orient: "vertical",
-    left: "80%",
     right: 20,
     top: 20,
-    bottom: 20,
-    // icon: "circle",
-    padding: [
-      40,
-      10,
-      40,
-      10
-    ],
     textStyle: {
       "width": 150,
       "overflow": "truncate",

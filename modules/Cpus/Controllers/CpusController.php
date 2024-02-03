@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Cpus\Controllers;
 
 use Illuminate\Http\Request;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Control\Controllers;
 
 use Modules\Control\Services\ControlGraphService;

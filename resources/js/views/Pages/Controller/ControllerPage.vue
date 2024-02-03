@@ -50,8 +50,8 @@
             </div>
           </div>
         </div>
-        <div class="col-12 col-lg-9">
-          <v-chart class="chart mt-4 border pt-2" :option="option"/>
+        <div class="col-12 col-lg-9" v-if="!empty">
+          <v-chart class="chart mt-4 border pt-3" :option="option"/>
         </div>
       </div>
     </div>
@@ -189,7 +189,7 @@ const option = ref({
               coord: [, 100]
             },
             {
-              coord: [, ]
+              coord: [,]
             }
           ]
         ]
@@ -201,6 +201,7 @@ const data = ref([]);
 const loading = ref(true);
 const modal = useModal()
 const temperature = ref('')
+const empty = ref(true)
 
 onMounted(() => {
   getData();
@@ -212,13 +213,17 @@ async function getData() {
     .then((response) => {
       data.value = response.data.data
       temperature.value = response.data.temperature
-      option.value.series.push(response.data.options.line)
-      option.value.xAxis = response.data.options.xAxis
+      if (response.data.options.line) {
+        option.value.series.push(response.data.options.line)
+        option.value.xAxis = response.data.options.xAxis
+        empty.value = false
+      }
     })
     .catch(() => {
+      empty.value = true
     })
     .finally(() => {
-      loading.value = false;
+      loading.value = false
     })
 }
 

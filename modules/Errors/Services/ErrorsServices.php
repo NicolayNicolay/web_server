@@ -11,18 +11,21 @@ use Modules\Errors\Models\Errors;
 
 class ErrorsServices
 {
-    public function createError(RequestException $requestException, array | string $data = []): void
+    public function createError(RequestException $requestException, array | string $data = []): string
     {
+        $error = json_decode($requestException->response->body());
+        $text = property_exists($error, 'errors') ? $error->errors->message : ($error->detail ?? '');
         if (is_array($data) && ! empty($data)) {
             (new Errors())->create(
                 [
                     'value' => $data[0],
                     'name'  => $data[1],
-                    'logs'  => json_decode($requestException->response->body())->errors->message,
+                    'logs'  => $text,
                 ]
             );
         } else {
-            Log::warning('Api method "' . $data . '" with error: ' . json_decode($requestException->response->body())->errors->message);
+            Log::warning('Api method "' . $data . '" with error: ' . $text);
         }
+        return $text;
     }
 }

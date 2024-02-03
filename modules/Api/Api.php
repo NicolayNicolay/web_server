@@ -12,8 +12,9 @@ use Illuminate\Support\Facades\Http;
 class Api
 {
     protected string $token = '';
+    protected int $timeout = 0;
 
-    public function __construct(protected Request $request)
+    public function __construct()
     {
         $this->setBearer();
     }
@@ -30,9 +31,7 @@ class Api
         if (! empty($host)) {
             return $host;
         }
-        $currentHost = $this->request->getHost();
-        $scheme = 'https';
-        return $scheme . '://' . $currentHost;
+        return '';
     }
 
     /**
@@ -44,6 +43,9 @@ class Api
         $apiUrl = $this->getHost() . config('api.path');
         $headers = ['Authorization' => 'Bearer ' . $this->token];
         $httpRequest = Http::asJson()->withHeaders($headers);
+        if ($this->timeout != 0) {
+            $httpRequest->timeout($this->timeout);
+        }
         $request = app(Request::class);
         if ($requestMethod === 'GET') {
             if ($request->has('debug')) {
@@ -66,16 +68,22 @@ class Api
     /**
      * @throws RequestException
      */
-    public function post(string $method, array $params = []): ?array
+    public function post(string $method, array $params = [], int $timeout = 0): ?array
     {
+        if ($timeout != 0) {
+            $this->timeout = $timeout;
+        }
         return $this->sendRequest($method, 'POST', $params);
     }
 
     /**
      * @throws RequestException
      */
-    public function get(string $method, array $params = []): ?array
+    public function get(string $method, array $params = [], int $timeout = 0): ?array
     {
+        if ($timeout != 0) {
+            $this->timeout = $timeout;
+        }
         return $this->sendRequest($method, 'GET', $params);
     }
 }

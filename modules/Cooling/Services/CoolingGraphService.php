@@ -9,7 +9,6 @@ use Modules\Controller\Services\ControllerGraphService;
 use Modules\Graph\AbstractGraph;
 use Modules\Graph\GraphInterface;
 use Modules\Temperatures\Models\Temperatures;
-
 use Modules\Temperatures\Models\TemperaturesCategories;
 
 use function Modules\Control\Services\sort;
@@ -47,7 +46,7 @@ class CoolingGraphService extends AbstractGraph
         $labels = [];
         $key = 0;
         $categories = TemperaturesCategories::pluck('id', 'code')->toArray();
-        if($data['items']) {
+        if ($data['items']) {
             foreach ($data['items'] as $datum) {
                 $result['series'][] = [
                     'dataGroupId' => $categories[$datum['code']],

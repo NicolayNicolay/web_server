@@ -38,7 +38,7 @@ class ControlGraphService extends AbstractGraph
             'series' => []
         ];
         $key = 0;
-        if($data['items']) {
+        if ($data['items']) {
             foreach ($data['items'] as $datum) {
                 $result['series'][] = [
                     'show'       => false,
@@ -65,10 +65,10 @@ class ControlGraphService extends AbstractGraph
             [
                 'type'        => "category",
                 'boundaryGap' => false,
-                'data'        => $data['labels']?? [],
+                'data'        => $data['labels'] ?? [],
             ],
         ];
-        $result['legend'] = $data['legends']?? [];
+        $result['legend'] = $data['legends'] ?? [];
         return $result;
     }
 }
